@@ -1,13 +1,23 @@
 import { Hono } from 'hono';
 import { hc } from 'hono/client';
+import { checkDatabaseConnection, getDatabaseInfo } from './db/connection.js';
 
 const app = new Hono();
 
 export const createRoutes = (app: Hono) => {
 	return app
 		.basePath("/api/v2/")
-		.get("/health", (c) => {
-			return c.json({ status: "ok", timestamp: new Date().toISOString() });
+		.get("/health", async (c) => {
+			const dbInfo = await getDatabaseInfo();
+			return c.json({ 
+				status: "ok", 
+				timestamp: new Date().toISOString(),
+				database: dbInfo
+			});
+		})
+		.get("/health/db", async (c) => {
+			const dbConnection = await checkDatabaseConnection();
+			return c.json(dbConnection);
 		})
 		.get("/", (c) => {
 			return c.json({ message: "Gyulist v2 API" });
