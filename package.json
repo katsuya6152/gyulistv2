@@ -5,12 +5,19 @@
   "private": true,
   "scripts": {
     "dev": "pnpm --parallel -r dev",
+    "dev:api": "pnpm --filter @gyulistv2/api dev",
+    "dev:web": "pnpm --filter @gyulistv2/web dev",
+    "dev:full": "pnpm dev:api & pnpm dev:web",
     "build": "pnpm -r build",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
     "type-check": "pnpm -r type-check",
-    "clean": "pnpm -r clean"
+    "clean": "pnpm -r clean",
+    "db:studio": "pnpm --filter @gyulistv2/api db:studio",
+    "db:generate": "pnpm --filter @gyulistv2/api db:generate",
+    "db:migrate": "pnpm --filter @gyulistv2/api db:migrate",
+    "setup:dev": ".devcontainer/scripts/dev-setup.sh"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.0",

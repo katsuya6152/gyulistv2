@@ -1,0 +1,41 @@
+FROM node:20
+
+# 作業ディレクトリを設定
+WORKDIR /workspace
+
+# pnpmをインストール
+RUN npm install -g pnpm
+
+# システムの依存関係をインストール
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    bash \
+    openssh-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# 既存のnodeユーザーのUIDとGIDを取得し、適切な権限を設定
+RUN usermod -u 1000 node && groupmod -g 1000 node
+
+# workspaceディレクトリの所有者を変更
+RUN chown -R node:node /workspace
+
+# 必要なディレクトリを作成し、適切な権限を設定
+RUN mkdir -p /workspace/apps/api/generated/prisma && \
+    mkdir -p /workspace/apps/web/.next && \
+    chown -R node:node /workspace/apps/api/generated && \
+    chown -R node:node /workspace/apps/web/.next
+
+# pnpmの設定を最適化
+RUN pnpm config set store-dir /home/node/.pnpm-store
+
+# ポートを公開
+EXPOSE 3000 3001
+
+# nodeユーザーに切り替え
+USER node
+
+# デフォルトコマンド（dev containerではsleep infinityで待機）
+CMD ["sleep", "infinity"]
+
+

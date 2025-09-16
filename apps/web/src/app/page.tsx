@@ -1,4 +1,10 @@
 import { client } from "@/lib/api-client";
+import { StatusCard } from "@/components/status-card";
+import { TechStack } from "@/components/tech-stack";
+import { HotReloadDemo } from "@/components/hot-reload-demo";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Sparkles, Zap, Heart, Code } from "lucide-react";
 
 // 動的レンダリングを強制
 export const dynamic = "force-dynamic";
@@ -6,12 +12,8 @@ export const dynamic = "force-dynamic";
 async function getHealthStatus() {
   try {
     const res = await client.api.v2.health.$get();
-    console.log(res);
-    if (res.ok) {
-      if (res.status === 200) {
-        return await res.json();
-      }
-      return null;
+    if (res.ok && res.status === 200) {
+      return await res.json();
     }
     return null;
   } catch (error) {
@@ -23,11 +25,8 @@ async function getHealthStatus() {
 async function getDatabaseStatus() {
   try {
     const res = await client.api.v2.health.db.$get();
-    if (res.ok) {
-      if (res.status === 200) {
-        return await res.json();
-      }
-      return null;
+    if (res.ok && res.status === 200) {
+      return await res.json();
     }
     return null;
   } catch (error) {
@@ -40,110 +39,133 @@ export default async function Home() {
   const healthStatus = await getHealthStatus();
   const databaseStatus = await getDatabaseStatus();
 
+  const getHealthStatusType = () => {
+    if (!healthStatus) return "error";
+    return "success";
+  };
+
+  const getDatabaseStatusType = () => {
+    if (!databaseStatus) return "error";
+    return databaseStatus.status === "connected" ? "success" : "error";
+  };
+
   return (
-    <main className="container mx-auto px-4 py-8">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-foreground mb-4">Gyulist v2</h1>
-        <p className="text-lg text-muted-foreground mb-8">モダンなWebアプリケーション</p>
-
-        {/* API接続ステータス */}
-        <div className="bg-card p-6 rounded-lg shadow-sm border mb-8">
-          <h2 className="text-xl font-semibold mb-4">API接続ステータス</h2>
-          {!healthStatus ? (
-            <div className="text-destructive">
-              <div className="font-medium">エラー</div>
-              <div className="text-sm">APIサーバーに接続できません</div>
-            </div>
-          ) : (
-            <div className="text-green-600">
-              <div className="font-medium">✓ 接続成功</div>
-              <div className="text-sm">ステータス: {healthStatus.status}</div>
-              <div className="text-sm">
-                時刻: {new Date(healthStatus.timestamp).toLocaleString("ja-JP")}
-              </div>
-              {healthStatus.database && "database" in healthStatus.database && (
-                <div className="mt-4 p-4 bg-gray-50 rounded border">
-                  <h3 className="font-medium text-gray-800 mb-2">データベース情報</h3>
-                  <div className="text-sm text-gray-600 space-y-1">
-                    <div>ステータス: {healthStatus.database.status}</div>
-                    {"database" in healthStatus.database && healthStatus.database.database && (
-                      <div>データベース名: {healthStatus.database.database}</div>
-                    )}
-                    {"host" in healthStatus.database && healthStatus.database.host && (
-                      <div>ホスト: {healthStatus.database.host}</div>
-                    )}
-                    {"version" in healthStatus.database && healthStatus.database.version && (
-                      <div>バージョン: {healthStatus.database.version}</div>
-                    )}
-                    {"size" in healthStatus.database && healthStatus.database.size && (
-                      <div>サイズ: {healthStatus.database.size}</div>
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* データベース接続ステータス */}
-        <div className="bg-card p-6 rounded-lg shadow-sm border mb-8">
-          <h2 className="text-xl font-semibold mb-4">データベース接続ステータス</h2>
-          {!databaseStatus ? (
-            <div className="text-destructive">
-              <div className="font-medium">エラー</div>
-              <div className="text-sm">データベースに接続できません</div>
-            </div>
-          ) : (
-            <div
-              className={
-                databaseStatus.status === "connected" ? "text-green-600" : "text-destructive"
-              }
-            >
-              <div className="font-medium">
-                {databaseStatus.status === "connected" ? "✓ 接続成功" : "✗ 接続失敗"}
-              </div>
-              <div className="text-sm">ステータス: {databaseStatus.status}</div>
-              {"database" in databaseStatus && databaseStatus.database && (
-                <div className="text-sm">データベース: {databaseStatus.database}</div>
-              )}
-              {"host" in databaseStatus && databaseStatus.host && (
-                <div className="text-sm">ホスト: {databaseStatus.host}</div>
-              )}
-              {"error" in databaseStatus && databaseStatus.error && (
-                <div className="text-sm text-red-500">エラー: {databaseStatus.error}</div>
-              )}
-              <div className="text-sm">
-                時刻: {new Date(databaseStatus.timestamp).toLocaleString("ja-JP")}
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="bg-card p-6 rounded-lg shadow-sm border">
-          <h2 className="text-xl font-semibold mb-4">技術スタック</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-            <div>
-              <h3 className="font-medium text-primary">フロントエンド</h3>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• Next.js 14 (App Router)</li>
-                <li>• TypeScript</li>
-                <li>• Tailwind CSS</li>
-                <li>• shadcn/ui</li>
-                <li>• Hono RPC (RSC)</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-medium text-primary">バックエンド</h3>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• Hono</li>
-                <li>• Drizzle ORM</li>
-                <li>• PostgreSQL</li>
-                <li>• Zod</li>
-                <li>• OpenAPI</li>
-              </ul>
-            </div>
+    <main className="min-h-screen bg-gradient-to-br from-background to-muted/20">
+      <div className="container mx-auto px-4 py-8 space-y-8">
+        {/* ヘッダーセクション */}
+        <div className="text-center space-y-4">
+          <div className="flex items-center justify-center gap-3">
+            <Sparkles className="h-8 w-8 text-primary" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              Gyulist v2
+            </h1>
+          </div>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            モダンな技術スタックで構築された、高速で美しいWebアプリケーション
+          </p>
+          <div className="flex justify-center gap-2">
+            <Badge variant="outline" className="flex items-center gap-1">
+              <Zap className="h-3 w-3" />
+              ホットリロード対応
+            </Badge>
+            <Badge variant="outline" className="flex items-center gap-1">
+              <Heart className="h-3 w-3" />
+              開発者体験重視
+            </Badge>
+            <Badge variant="outline" className="flex items-center gap-1">
+              <Code className="h-3 w-3" />
+              TypeScript
+            </Badge>
           </div>
         </div>
+
+        {/* ステータスカード */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <StatusCard
+            title="API接続ステータス"
+            description="バックエンドAPIサーバーとの接続状態"
+            status={getHealthStatusType()}
+            data={healthStatus ? {
+              status: healthStatus.status,
+              timestamp: new Date(healthStatus.timestamp).toLocaleString("ja-JP"),
+              ...(healthStatus.database && "database" in healthStatus.database ? {
+                database: healthStatus.database.database,
+                host: healthStatus.database.host,
+                version: healthStatus.database.version,
+                size: healthStatus.database.size
+              } : {})
+            } : null}
+            lastUpdated={healthStatus ? new Date(healthStatus.timestamp) : undefined}
+          />
+          
+          <StatusCard
+            title="データベース接続ステータス"
+            description="PostgreSQLデータベースとの接続状態"
+            status={getDatabaseStatusType()}
+            data={databaseStatus ? {
+              status: databaseStatus.status,
+              database: "database" in databaseStatus ? databaseStatus.database : undefined,
+              host: "host" in databaseStatus ? databaseStatus.host : undefined,
+              error: "error" in databaseStatus ? databaseStatus.error : undefined,
+              timestamp: new Date(databaseStatus.timestamp).toLocaleString("ja-JP")
+            } : null}
+            lastUpdated={databaseStatus ? new Date(databaseStatus.timestamp) : undefined}
+          />
+        </div>
+
+        {/* ホットリロードデモ */}
+        <HotReloadDemo />
+
+        {/* 技術スタック */}
+        <TechStack />
+
+        {/* 開発者向け情報 */}
+        <Card className="border-dashed">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Code className="h-5 w-5" />
+              開発者向け情報
+            </CardTitle>
+            <CardDescription>
+              このアプリケーションの開発環境とコマンド
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-medium mb-3">利用可能なコマンド</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between items-center p-2 bg-muted/50 rounded">
+                    <code>pnpm dev:full</code>
+                    <Badge variant="outline">開発サーバー起動</Badge>
+                  </div>
+                  <div className="flex justify-between items-center p-2 bg-muted/50 rounded">
+                    <code>pnpm dev:api</code>
+                    <Badge variant="outline">APIサーバーのみ</Badge>
+                  </div>
+                  <div className="flex justify-between items-center p-2 bg-muted/50 rounded">
+                    <code>pnpm dev:web</code>
+                    <Badge variant="outline">Webアプリのみ</Badge>
+                  </div>
+                  <div className="flex justify-between items-center p-2 bg-muted/50 rounded">
+                    <code>pnpm db:studio</code>
+                    <Badge variant="outline">Prisma Studio</Badge>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h4 className="font-medium mb-3">開発環境</h4>
+                <div className="space-y-2 text-sm text-muted-foreground">
+                  <div>• ホットリロード: 有効</div>
+                  <div>• TypeScript: 厳密モード</div>
+                  <div>• ESLint: 有効</div>
+                  <div>• Prettier: 有効</div>
+                  <div>• 自動フォーマット: 保存時</div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </main>
   );
