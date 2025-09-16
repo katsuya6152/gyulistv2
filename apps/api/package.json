@@ -4,6 +4,14 @@
   "description": "Gyulist v2 API Server",
   "private": true,
   "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
@@ -15,7 +23,7 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "hono": "^4.0.0",
+    "hono": "^4.6.0",
     "@hono/node-server": "^1.8.0",
     "drizzle-orm": "^0.29.0",
     "postgres": "^3.4.0",

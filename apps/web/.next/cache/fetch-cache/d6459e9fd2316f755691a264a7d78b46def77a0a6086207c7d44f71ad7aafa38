@@ -1,0 +1,1 @@
+{"kind":"FETCH","data":{"headers":{"connection":"keep-alive","content-length":"54","content-type":"application/json","date":"Tue, 16 Sep 2025 07:02:19 GMT","keep-alive":"timeout=5"},"body":"eyJzdGF0dXMiOiJvayIsInRpbWVzdGFtcCI6IjIwMjUtMDktMTZUMDc6MDI6MTkuMjI4WiJ9","status":200,"url":"http://localhost:3001/api/v2/health"},"revalidate":31536000,"tags":[]}

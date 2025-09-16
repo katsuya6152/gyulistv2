@@ -694,8 +694,15 @@ video {
 .font-semibold {
   font-weight: 600;
 }
+.text-destructive {
+  color: hsl(var(--destructive));
+}
 .text-foreground {
   color: hsl(var(--foreground));
+}
+.text-green-600 {
+  --tw-text-opacity: 1;
+  color: rgb(22 163 74 / var(--tw-text-opacity, 1));
 }
 .text-muted-foreground {
   color: hsl(var(--muted-foreground));

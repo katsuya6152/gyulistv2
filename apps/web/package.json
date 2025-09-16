@@ -12,18 +12,20 @@
     "clean": "rm -rf .next"
   },
   "dependencies": {
-    "next": "^14.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "zod": "^3.22.0",
     "@conform-to/react": "^0.7.0",
     "@conform-to/zod": "^0.7.0",
+    "@gyulistv2/api": "workspace:*",
     "@radix-ui/react-slot": "^1.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
+    "hono": "^4.9.7",
     "lucide-react": "^0.294.0",
+    "next": "^14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "tailwind-merge": "^2.0.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.22.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
