@@ -1,9 +1,10 @@
-import postgres from 'postgres';
-import { drizzle } from 'drizzle-orm/postgres-js';
-import * as schema from './schema.js';
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import * as schema from "./schema.js";
 
 // データベース接続URL
-const connectionString = process.env.DATABASE_URL || 'postgresql://postgres:password@postgres:5432/gyulistv2';
+const connectionString =
+  process.env.DATABASE_URL || "postgresql://postgres:password@postgres:5432/gyulistv2";
 
 // PostgreSQLクライアント
 const client = postgres(connectionString);
@@ -16,15 +17,15 @@ export async function checkDatabaseConnection() {
   try {
     await client`SELECT 1 as connected`;
     return {
-      status: 'connected',
-      database: 'gyulistv2',
-      host: 'postgres:5432',
+      status: "connected",
+      database: "gyulistv2",
+      host: "postgres:5432",
       timestamp: new Date().toISOString(),
     };
   } catch (error) {
     return {
-      status: 'disconnected',
-      error: error instanceof Error ? error.message : 'Unknown error',
+      status: "disconnected",
+      error: error instanceof Error ? error.message : "Unknown error",
       timestamp: new Date().toISOString(),
     };
   }
@@ -41,19 +42,19 @@ export async function getDatabaseInfo() {
       FROM pg_database 
       WHERE datname = current_database()
     `;
-    
+
     return {
-      status: 'connected',
+      status: "connected",
       version: versionResult[0]?.version,
       database: dbSizeResult[0]?.database_name,
       size: dbSizeResult[0]?.size,
-      host: 'postgres:5432',
+      host: "postgres:5432",
       timestamp: new Date().toISOString(),
     };
   } catch (error) {
     return {
-      status: 'error',
-      error: error instanceof Error ? error.message : 'Unknown error',
+      status: "error",
+      error: error instanceof Error ? error.message : "Unknown error",
       timestamp: new Date().toISOString(),
     };
   }

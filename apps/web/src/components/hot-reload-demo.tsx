@@ -1,61 +1,51 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { 
-  RefreshCw, 
-  Heart, 
-  Star, 
-  Zap, 
-  Clock,
-  CheckCircle,
-  Sparkles
-} from "lucide-react"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CheckCircle, Clock, Heart, RefreshCw, Sparkles, Star, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export function HotReloadDemo() {
-  const [counter, setCounter] = useState(0)
-  const [lastUpdate, setLastUpdate] = useState(new Date())
-  const [isAnimating, setIsAnimating] = useState(false)
-  const [favorites, setFavorites] = useState<string[]>([])
+  const [counter, setCounter] = useState(0);
+  const [lastUpdate, setLastUpdate] = useState(new Date());
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [favorites, setFavorites] = useState<string[]>([]);
 
   const features = [
     { name: "リアルタイム更新", icon: <RefreshCw className="h-4 w-4" />, color: "text-blue-500" },
     { name: "状態保持", icon: <Heart className="h-4 w-4" />, color: "text-red-500" },
     { name: "高速リロード", icon: <Zap className="h-4 w-4" />, color: "text-yellow-500" },
     { name: "開発効率", icon: <Star className="h-4 w-4" />, color: "text-purple-500" },
-  ]
+  ];
 
   const handleIncrement = () => {
-    setCounter(prev => prev + 1)
-    setLastUpdate(new Date())
-    setIsAnimating(true)
-    setTimeout(() => setIsAnimating(false), 300)
-  }
+    setCounter((prev) => prev + 1);
+    setLastUpdate(new Date());
+    setIsAnimating(true);
+    setTimeout(() => setIsAnimating(false), 300);
+  };
 
   const handleReset = () => {
-    setCounter(0)
-    setLastUpdate(new Date())
-    setIsAnimating(true)
-    setTimeout(() => setIsAnimating(false), 300)
-  }
+    setCounter(0);
+    setLastUpdate(new Date());
+    setIsAnimating(true);
+    setTimeout(() => setIsAnimating(false), 300);
+  };
 
   const toggleFavorite = (feature: string) => {
-    setFavorites(prev => 
-      prev.includes(feature) 
-        ? prev.filter(f => f !== feature)
-        : [...prev, feature]
-    )
-  }
+    setFavorites((prev) =>
+      prev.includes(feature) ? prev.filter((f) => f !== feature) : [...prev, feature]
+    );
+  };
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setLastUpdate(new Date())
-    }, 1000)
+      setLastUpdate(new Date());
+    }, 1000);
 
-    return () => clearInterval(interval)
-  }, [])
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -77,15 +67,15 @@ export function HotReloadDemo() {
               <Clock className="h-5 w-5" />
               インタラクティブカウンター
             </CardTitle>
-            <CardDescription>
-              ボタンをクリックしてカウンターを増やしてみてください
-            </CardDescription>
+            <CardDescription>ボタンをクリックしてカウンターを増やしてみてください</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center">
-              <div className={`text-4xl font-bold transition-all duration-300 ${
-                isAnimating ? 'scale-110 text-primary' : 'text-foreground'
-              }`}>
+              <div
+                className={`text-4xl font-bold transition-all duration-300 ${
+                  isAnimating ? "scale-110 text-primary" : "text-foreground"
+                }`}
+              >
                 {counter}
               </div>
               <div className="text-sm text-muted-foreground mt-2">
@@ -111,22 +101,18 @@ export function HotReloadDemo() {
               <Star className="h-5 w-5" />
               お気に入り機能
             </CardTitle>
-            <CardDescription>
-              機能をクリックしてお気に入りに追加/削除できます
-            </CardDescription>
+            <CardDescription>機能をクリックしてお気に入りに追加/削除できます</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
               {features.map((feature, index) => (
-                <div 
+                <div
                   key={index}
                   className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer"
                   onClick={() => toggleFavorite(feature.name)}
                 >
                   <div className="flex items-center gap-3">
-                    <span className={feature.color}>
-                      {feature.icon}
-                    </span>
+                    <span className={feature.color}>{feature.icon}</span>
                     <span className="font-medium">{feature.name}</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -167,9 +153,12 @@ export function HotReloadDemo() {
         <CardContent>
           <div className="space-y-3 text-sm">
             <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
-              <div className="font-medium text-blue-800 dark:text-blue-200">1. このコンポーネントを編集</div>
+              <div className="font-medium text-blue-800 dark:text-blue-200">
+                1. このコンポーネントを編集
+              </div>
               <div className="text-blue-600 dark:text-blue-300">
-                <code>/workspace/apps/web/src/components/hot-reload-demo.tsx</code> を編集してください
+                <code>/workspace/apps/web/src/components/hot-reload-demo.tsx</code>{" "}
+                を編集してください
               </div>
             </div>
             <div className="p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
@@ -179,7 +168,9 @@ export function HotReloadDemo() {
               </div>
             </div>
             <div className="p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg">
-              <div className="font-medium text-purple-800 dark:text-purple-200">3. 状態の保持を確認</div>
+              <div className="font-medium text-purple-800 dark:text-purple-200">
+                3. 状態の保持を確認
+              </div>
               <div className="text-purple-600 dark:text-purple-300">
                 カウンターの値やお気に入りが保持されていることを確認してください
               </div>
@@ -188,5 +179,5 @@ export function HotReloadDemo() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

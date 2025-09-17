@@ -1,10 +1,10 @@
-import { client } from "@/lib/api-client";
+import { HotReloadDemo } from "@/components/hot-reload-demo";
 import { StatusCard } from "@/components/status-card";
 import { TechStack } from "@/components/tech-stack";
-import { HotReloadDemo } from "@/components/hot-reload-demo";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Zap, Heart, Code } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { client } from "@/lib/api-client";
+import { Code, Heart, Sparkles, Zap } from "lucide-react";
 
 // 動的レンダリングを強制
 export const dynamic = "force-dynamic";
@@ -85,30 +85,40 @@ export default async function Home() {
             title="API接続ステータス"
             description="バックエンドAPIサーバーとの接続状態"
             status={getHealthStatusType()}
-            data={healthStatus ? {
-              status: healthStatus.status,
-              timestamp: new Date(healthStatus.timestamp).toLocaleString("ja-JP"),
-              ...(healthStatus.database && "database" in healthStatus.database ? {
-                database: healthStatus.database.database,
-                host: healthStatus.database.host,
-                version: healthStatus.database.version,
-                size: healthStatus.database.size
-              } : {})
-            } : null}
+            data={
+              healthStatus
+                ? {
+                    status: healthStatus.status,
+                    timestamp: new Date(healthStatus.timestamp).toLocaleString("ja-JP"),
+                    ...(healthStatus.database && "database" in healthStatus.database
+                      ? {
+                          database: healthStatus.database.database,
+                          host: healthStatus.database.host,
+                          version: healthStatus.database.version,
+                          size: healthStatus.database.size,
+                        }
+                      : {}),
+                  }
+                : null
+            }
             lastUpdated={healthStatus ? new Date(healthStatus.timestamp) : undefined}
           />
-          
+
           <StatusCard
             title="データベース接続ステータス"
             description="PostgreSQLデータベースとの接続状態"
             status={getDatabaseStatusType()}
-            data={databaseStatus ? {
-              status: databaseStatus.status,
-              database: "database" in databaseStatus ? databaseStatus.database : undefined,
-              host: "host" in databaseStatus ? databaseStatus.host : undefined,
-              error: "error" in databaseStatus ? databaseStatus.error : undefined,
-              timestamp: new Date(databaseStatus.timestamp).toLocaleString("ja-JP")
-            } : null}
+            data={
+              databaseStatus
+                ? {
+                    status: databaseStatus.status,
+                    database: "database" in databaseStatus ? databaseStatus.database : undefined,
+                    host: "host" in databaseStatus ? databaseStatus.host : undefined,
+                    error: "error" in databaseStatus ? databaseStatus.error : undefined,
+                    timestamp: new Date(databaseStatus.timestamp).toLocaleString("ja-JP"),
+                  }
+                : null
+            }
             lastUpdated={databaseStatus ? new Date(databaseStatus.timestamp) : undefined}
           />
         </div>
@@ -126,9 +136,7 @@ export default async function Home() {
               <Code className="h-5 w-5" />
               開発者向け情報
             </CardTitle>
-            <CardDescription>
-              このアプリケーションの開発環境とコマンド
-            </CardDescription>
+            <CardDescription>このアプリケーションの開発環境とコマンド</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
