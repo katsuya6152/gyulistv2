@@ -1,12 +1,21 @@
 import { Hono } from "hono";
 import { hc } from "hono/client";
+import { cors } from "hono/cors";
 import { checkDatabaseConnection, getDatabaseInfo } from "./db/connection.js";
+import authRoutes from "./presentation/routes/auth";
 
 const app = new Hono();
+
+// CORS設定
+app.use("*", cors({
+  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  credentials: true,
+}));
 
 export const createRoutes = (app: Hono) => {
   return app
     .basePath("/api/v2/")
+    .route("/auth", authRoutes)
     .get("/health", async (c) => {
       const dbInfo = await getDatabaseInfo();
       return c.json({
