@@ -2,8 +2,7 @@
 
 import { authService } from "@/services/authService";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { type RegisterFormData, registerSchema } from "./schema";
+import { registerSchema } from "./schema";
 
 export async function registerAction(formData: FormData) {
   // 1. フォームデータを解析
@@ -29,7 +28,13 @@ export async function registerAction(formData: FormData) {
     // 3. API呼び出し
     const response = await authService.register(validationResult.data);
 
-    if (response.success && response.data) {
+    if (
+      response.success &&
+      response.data &&
+      response.data.accessToken &&
+      response.data.refreshToken &&
+      response.data.user
+    ) {
       // 4. トークンをCookieに保存（セキュア）
       const cookieStore = cookies();
       cookieStore.set("accessToken", response.data.accessToken, {
@@ -60,7 +65,7 @@ export async function registerAction(formData: FormData) {
 
     return {
       success: false,
-      error: response.error || "登録に失敗しました",
+      error: "登録に失敗しました",
     };
   } catch (error) {
     console.error("Registration error:", error);

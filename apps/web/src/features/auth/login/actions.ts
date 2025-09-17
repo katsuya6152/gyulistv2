@@ -2,8 +2,7 @@
 
 import { authService } from "@/services/authService";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { type LoginFormData, loginSchema } from "./schema";
+import { loginSchema } from "./schema";
 
 export async function loginAction(formData: FormData) {
   // 1. フォームデータを解析
@@ -26,7 +25,13 @@ export async function loginAction(formData: FormData) {
     // 3. API呼び出し
     const response = await authService.login(validationResult.data);
 
-    if (response.success && response.data) {
+    if (
+      response.success &&
+      response.data &&
+      response.data.accessToken &&
+      response.data.refreshToken &&
+      response.data.user
+    ) {
       // 4. トークンをCookieに保存（セキュア）
       const cookieStore = cookies();
       cookieStore.set("accessToken", response.data.accessToken, {
@@ -57,7 +62,7 @@ export async function loginAction(formData: FormData) {
 
     return {
       success: false,
-      error: response.error || "ログインに失敗しました",
+      error: "ログインに失敗しました",
     };
   } catch (error) {
     console.error("Login error:", error);
