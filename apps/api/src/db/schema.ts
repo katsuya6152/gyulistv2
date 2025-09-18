@@ -1,14 +1,4 @@
-import {
-  date,
-  decimal,
-  integer,
-  pgTable,
-  serial,
-  text,
-  timestamp,
-  uuid,
-  varchar,
-} from "drizzle-orm/pg-core";
+import { date, decimal, integer, pgTable, serial, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
 // 農場テーブル
 export const farms = pgTable("farms", {
@@ -92,9 +82,7 @@ export const calves = pgTable("calves", {
   buyer: varchar("buyer", { length: 200 }), // 購買者
   remarks: text("remarks"), // 備考
   // その他
-  cowId: uuid("cow_id")
-    .notNull()
-    .references(() => cows.id), // 母牛ID
+  cowId: uuid("cow_id").references(() => cows.id), // 母牛ID（nullable）
   healthStatus: varchar("health_status", { length: 20 }).notNull().default("HEALTHY"),
   farmId: uuid("farm_id")
     .notNull()

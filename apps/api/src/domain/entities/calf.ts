@@ -5,7 +5,7 @@ export interface Calf {
   readonly individualNumber: string;
   readonly calfName: string;
   readonly damName: string | null;
-  readonly damId: string;
+  readonly damId: string | null;
   readonly damIndividualNumber: string | null;
   readonly birthDate: string;
   // 血統情報
@@ -37,7 +37,7 @@ export const createCalf = (input: {
   individualNumber: string;
   calfName: string;
   damName: string | null;
-  damId: string;
+  damId: string | null;
   damIndividualNumber?: string | null;
   birthDate: string;
   gender: "MALE" | "FEMALE" | "CASTRATED";
@@ -64,7 +64,7 @@ export const createCalf = (input: {
   individualNumber: input.individualNumber,
   calfName: input.calfName,
   damName: input.damName,
-  damId: input.damId,
+  damId: input.damId ?? null,
   damIndividualNumber: input.damIndividualNumber ?? null,
   birthDate: input.birthDate,
   // 血統情報

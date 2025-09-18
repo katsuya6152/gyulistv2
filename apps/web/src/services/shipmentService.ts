@@ -7,6 +7,7 @@ import type { InferRequestType, InferResponseType } from "hono/client";
 type GetCalfShipmentsRequest = InferRequestType<typeof client.api.v2.calves.shipments.$get>["query"];
 type UpdateCalfShipmentRequest = InferRequestType<(typeof client.api.v2.calves)[":id"]["shipment"]["$put"]>["json"];
 type BatchUpdateCalfShipmentsRequest = InferRequestType<typeof client.api.v2.calves.shipments.batch.$put>["json"];
+type CreateCalfRequest = InferRequestType<typeof client.api.v2.calves.$post>["json"];
 
 // HTTPステータス200の時の型を直接取得
 export type GetCalfShipmentsSuccess = InferResponseType<typeof client.api.v2.calves.shipments.$get, 200>;
@@ -14,6 +15,7 @@ export type UpdateCalfShipmentSuccess = InferResponseType<(typeof client.api.v2.
 export type CancelCalfShipmentSuccess = InferResponseType<(typeof client.api.v2.calves)[":id"]["shipment"]["cancel"]["$put"], 200>;
 export type BatchUpdateCalfShipmentsSuccess = InferResponseType<typeof client.api.v2.calves.shipments.batch.$put, 200>;
 export type GetCowShipmentInfoSuccess = InferResponseType<(typeof client.api.v2.cows)[":cowId"]["calves"]["shipments"]["$get"], 200>;
+export type CreateCalfSuccess = InferResponseType<typeof client.api.v2.calves.$post, 200>;
 
 class ShipmentService {
   /**
@@ -92,6 +94,37 @@ class ShipmentService {
     if (response.status !== 200) {
       const errorData = await response.json();
       throw new Error("error" in errorData ? errorData.error : "母牛情報の取得に失敗しました");
+    }
+
+    return response.json();
+  }
+
+  /**
+   * 新規子牛を作成
+   */
+  async createCalf(data: CreateCalfRequest): Promise<CreateCalfSuccess> {
+    const response = await client.api.v2.calves.$post({
+      json: data,
+    });
+
+    if (response.status !== 200) {
+      const errorData = await response.json();
+      console.error("API error response:", {
+        status: response.status,
+        errorData: errorData,
+      });
+
+      // エラーメッセージを適切に文字列化
+      let errorMessage = "子牛の作成に失敗しました";
+      if ("error" in errorData) {
+        if (typeof errorData.error === "string") {
+          errorMessage = errorData.error;
+        } else if (typeof errorData.error === "object" && errorData.error !== null) {
+          errorMessage = JSON.stringify(errorData.error);
+        }
+      }
+
+      throw new Error(errorMessage);
     }
 
     return response.json();

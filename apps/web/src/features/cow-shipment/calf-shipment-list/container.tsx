@@ -1,8 +1,8 @@
 // 子牛出荷一覧のContainer（Server Component）
 
-import { shipmentService } from "@/services/shipmentService";
 import { Suspense } from "react";
 import { shipmentFiltersSchema } from "../schemas/calf-shipment";
+import { getCalfShipmentsAction } from "./actions";
 import CalfShipmentListPresentation from "./presentational";
 
 interface CalfShipmentListContainerProps {
@@ -42,15 +42,23 @@ export default async function CalfShipmentListContainer({ searchParams }: CalfSh
 
   try {
     // 初期データを取得
-    const initialData = await shipmentService.getCalfShipments({
+    const result = await getCalfShipmentsAction({
       ...validatedFilters,
-      limit: limit.toString(),
+      limit: limit,
     });
 
+    if (result.success && result.data) {
+      return (
+        <Suspense fallback={<CalfShipmentListSkeleton />}>
+          <CalfShipmentListPresentation initialData={result.data} filters={validatedFilters} limit={limit} />
+        </Suspense>
+      );
+    }
+
     return (
-      <Suspense fallback={<CalfShipmentListSkeleton />}>
-        <CalfShipmentListPresentation initialData={initialData} filters={validatedFilters} limit={limit} />
-      </Suspense>
+      <div className="p-4">
+        <div className="text-red-600">子牛出荷一覧の読み込みに失敗しました: {result.error || "不明なエラー"}</div>
+      </div>
     );
   } catch (error) {
     console.error("Failed to load calf shipments:", error);

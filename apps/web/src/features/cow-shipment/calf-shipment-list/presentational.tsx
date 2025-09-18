@@ -4,10 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { shipmentService } from "@/services/shipmentService";
 import type { CalfShipment, GetCalfShipmentsSuccess, ShipmentFilters, UpdateCalfShipmentParams } from "@/types/calf-shipment";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { batchUpdateCalfShipmentsAction, cancelCalfShipmentAction, updateCalfShipmentAction } from "./actions";
+import { batchUpdateCalfShipmentsAction, cancelCalfShipmentAction, getCalfShipmentsAction, updateCalfShipmentAction } from "./actions";
 import { ErrorMessage } from "./components/ErrorMessage";
 import { LoadingSpinner } from "./components/LoadingSpinner";
 import { ShipmentFiltersComponent } from "./components/ShipmentFilters";
@@ -38,17 +37,20 @@ export default function CalfShipmentListPresentation({ initialData, filters, lim
     setError(null);
 
     try {
-      const response = await shipmentService.getCalfShipments({
+      const result = await getCalfShipmentsAction({
         ...currentFilters,
         cursor: pagination.nextCursor,
-        limit: limit.toString(),
+        limit: limit,
       });
 
-      if (response.success) {
-        setCalves((prev) => [...prev, ...response.data.calves]);
-        setPagination(response.data.pagination);
+      if (result.success && result.data) {
+        setCalves((prev) => [...prev, ...result.data.data.calves]);
+        setPagination(result.data.data.pagination);
+      } else {
+        setError(result.error || "データの読み込みに失敗しました");
       }
     } catch (err) {
+      console.error("Load more error:", err);
       setError(err instanceof Error ? err.message : "データの読み込みに失敗しました");
     } finally {
       setIsLoading(false);
@@ -66,16 +68,19 @@ export default function CalfShipmentListPresentation({ initialData, filters, lim
       setError(null);
 
       try {
-        const response = await shipmentService.getCalfShipments({
+        const result = await getCalfShipmentsAction({
           ...newFilters,
-          limit: limit.toString(),
+          limit: limit,
         });
 
-        if (response.success) {
-          setCalves(response.data.calves);
-          setPagination(response.data.pagination);
+        if (result.success && result.data) {
+          setCalves(result.data.data.calves);
+          setPagination(result.data.data.pagination);
+        } else {
+          setError(result.error || "フィルターの適用に失敗しました");
         }
       } catch (err) {
+        console.error("Filter change error:", err);
         setError(err instanceof Error ? err.message : "フィルターの適用に失敗しました");
       } finally {
         setIsLoading(false);
@@ -85,7 +90,19 @@ export default function CalfShipmentListPresentation({ initialData, filters, lim
   );
 
   // インライン編集の実装
-  const { editingRows, newRows, pendingChanges, startEditing, cancelEditing, saveChanges, addNewRow, removeNewRow, updateField } = useInlineEditing();
+  const {
+    editingRows,
+    newRows,
+    pendingChanges,
+    startEditing,
+    cancelEditing,
+    saveChanges,
+    addNewRow,
+    removeNewRow,
+    saveNewRow,
+    updateField,
+    updateNewRowField,
+  } = useInlineEditing();
 
   // 個別更新の処理
   const handleUpdate = useCallback(async (id: string, updates: Omit<UpdateCalfShipmentParams, "id">) => {
@@ -94,7 +111,6 @@ export default function CalfShipmentListPresentation({ initialData, filters, lim
       const result = await updateCalfShipmentAction(id, updates);
 
       if (result.success && result.data) {
-        console.log("Update response:", result);
         setCalves((prev) => prev.map((calf) => (calf.id === id ? result.data : calf)));
       } else {
         setError(result.error || "更新に失敗しました");
@@ -121,6 +137,35 @@ export default function CalfShipmentListPresentation({ initialData, filters, lim
     }
   }, []);
 
+  // 新規行保存の処理
+  const handleSaveNewRow = useCallback(
+    async (id: string) => {
+      try {
+        await saveNewRow(
+          id,
+          () => {
+            // 成功時はデータを再取得
+            getCalfShipmentsAction({
+              ...currentFilters,
+              limit: calves.length,
+            }).then((result) => {
+              if (result.success && result.data) {
+                setCalves(result.data.data.calves);
+              }
+            });
+          },
+          (error) => {
+            setError(error);
+          }
+        );
+      } catch (err) {
+        console.error("Save new row error:", err);
+        setError(err instanceof Error ? err.message : "新規行の保存に失敗しました");
+      }
+    },
+    [saveNewRow, currentFilters, calves.length]
+  );
+
   // 一括保存の処理
   const handleBatchSave = useCallback(async () => {
     if (pendingChanges.length === 0) return;
@@ -132,13 +177,15 @@ export default function CalfShipmentListPresentation({ initialData, filters, lim
 
       if (result.success) {
         // 更新されたデータを再取得
-        const refreshResponse = await shipmentService.getCalfShipments({
+        const refreshResult = await getCalfShipmentsAction({
           ...currentFilters,
-          limit: calves.length.toString(),
+          limit: calves.length,
         });
 
-        if (refreshResponse.success) {
-          setCalves(refreshResponse.data.calves);
+        if (refreshResult.success && refreshResult.data) {
+          setCalves(refreshResult.data.data.calves);
+        } else {
+          setError(refreshResult.error || "データの再取得に失敗しました");
         }
 
         // 編集状態をリセット
@@ -192,6 +239,8 @@ export default function CalfShipmentListPresentation({ initialData, filters, lim
             onUpdate={handleUpdate}
             onCancelShipment={handleCancelShipment}
             onFieldUpdate={updateField}
+            onNewRowFieldUpdate={updateNewRowField}
+            onSaveNewRow={handleSaveNewRow}
             onRemoveNewRow={removeNewRow}
           />
         </CardContent>

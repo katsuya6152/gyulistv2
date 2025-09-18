@@ -36,12 +36,25 @@ export class DrizzleCalfRepository implements CalfRepository {
           damId: calves.cowId,
           damIndividualNumber: cows.individualNumber,
           birthDate: calves.birthDate,
-          gender: calves.gender,
-          weight: calves.weight,
+          // 血統情報
+          sirePedigree: calves.sirePedigree,
+          maternalGrandsire: calves.maternalGrandsire,
+          maternalGreatGrandsire: calves.maternalGreatGrandsire,
+          maternalGreatGreatGrandsire: calves.maternalGreatGreatGrandsire,
+          // 繁殖・出産情報
+          matingDate: calves.matingDate,
+          expectedBirthDate: calves.expectedBirthDate,
           auctionDate: calves.auctionDate,
+          matingInterval: calves.matingInterval,
+          // 個体情報
+          weight: calves.weight,
+          ageInDays: calves.ageInDays,
+          gender: calves.gender,
+          // 取引情報
           price: calves.price,
           buyer: calves.buyer,
           remarks: calves.remarks,
+          // その他
           farmId: calves.farmId,
           healthStatus: calves.healthStatus,
           createdAt: calves.createdAt,
@@ -126,7 +139,42 @@ export class DrizzleCalfRepository implements CalfRepository {
 
   async findByCowId(cowId: string): Promise<Result<Calf[], RepositoryError>> {
     try {
-      const results = await db.select().from(calves).where(eq(calves.cowId, cowId)).orderBy(desc(calves.birthDate));
+      const results = await db
+        .select({
+          id: calves.id,
+          individualNumber: calves.individualNumber,
+          calfName: calves.calfName,
+          damName: calves.damName,
+          damId: calves.cowId,
+          damIndividualNumber: calves.damIndividualNumber,
+          birthDate: calves.birthDate,
+          // 血統情報
+          sirePedigree: calves.sirePedigree,
+          maternalGrandsire: calves.maternalGrandsire,
+          maternalGreatGrandsire: calves.maternalGreatGrandsire,
+          maternalGreatGreatGrandsire: calves.maternalGreatGreatGrandsire,
+          // 繁殖・出産情報
+          matingDate: calves.matingDate,
+          expectedBirthDate: calves.expectedBirthDate,
+          auctionDate: calves.auctionDate,
+          matingInterval: calves.matingInterval,
+          // 個体情報
+          weight: calves.weight,
+          ageInDays: calves.ageInDays,
+          gender: calves.gender,
+          // 取引情報
+          price: calves.price,
+          buyer: calves.buyer,
+          remarks: calves.remarks,
+          // その他
+          farmId: calves.farmId,
+          healthStatus: calves.healthStatus,
+          createdAt: calves.createdAt,
+          updatedAt: calves.updatedAt,
+        })
+        .from(calves)
+        .where(eq(calves.cowId, cowId))
+        .orderBy(desc(calves.birthDate));
 
       return { success: true, data: results.map(this.mapToCalf) };
     } catch (error) {
@@ -149,10 +197,23 @@ export class DrizzleCalfRepository implements CalfRepository {
           individualNumber: calf.individualNumber,
           calfName: calf.calfName,
           damName: calf.damName,
-          cowId: calf.damId,
+          damIndividualNumber: calf.damIndividualNumber,
+          cowId: calf.damId || null,
           birthDate: calf.birthDate,
           gender: calf.gender,
+          // 血統情報
+          sirePedigree: calf.sirePedigree,
+          maternalGrandsire: calf.maternalGrandsire,
+          maternalGreatGrandsire: calf.maternalGreatGrandsire,
+          maternalGreatGreatGrandsire: calf.maternalGreatGreatGrandsire,
+          // 繁殖・出産情報
+          matingDate: calf.matingDate,
+          expectedBirthDate: calf.expectedBirthDate,
+          matingInterval: calf.matingInterval,
+          // 個体情報
           weight: calf.weight?.toString(),
+          ageInDays: calf.ageInDays,
+          // 取引情報
           auctionDate: calf.auctionDate,
           price: calf.price?.toString(),
           buyer: calf.buyer,
@@ -183,7 +244,7 @@ export class DrizzleCalfRepository implements CalfRepository {
           individualNumber: calf.individualNumber,
           calfName: calf.calfName,
           damName: calf.damName,
-          cowId: calf.damId,
+          cowId: calf.damId || null,
           birthDate: calf.birthDate,
           gender: calf.gender,
           weight: calf.weight?.toString(),
@@ -306,7 +367,7 @@ export class DrizzleCalfRepository implements CalfRepository {
       individualNumber: row.individualNumber as string,
       calfName: row.calfName as string,
       damName: row.damName as string | null,
-      damId: row.damId as string,
+      damId: row.damId as string | null,
       damIndividualNumber: row.damIndividualNumber as string | null,
       birthDate: row.birthDate as string,
       // 血統情報
@@ -321,7 +382,7 @@ export class DrizzleCalfRepository implements CalfRepository {
       matingInterval: row.matingInterval ? Number.parseFloat(row.matingInterval as string) : null,
       // 個体情報
       weight: row.weight ? Number.parseFloat(row.weight as string) : null,
-      ageInDays: calculateAgeInDays(row.birthDate as string),
+      ageInDays: row.ageInDays ? Number.parseInt(row.ageInDays as string) : calculateAgeInDays(row.birthDate as string),
       gender: row.gender as "MALE" | "FEMALE" | "CASTRATED",
       // 取引情報
       price: row.price ? Number.parseFloat(row.price as string) : null,

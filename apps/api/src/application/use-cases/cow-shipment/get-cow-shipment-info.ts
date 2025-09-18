@@ -106,38 +106,41 @@ export class GetCowShipmentInfoUseCase {
           healthStatus: cowResult.data.healthStatus,
           farmId: cowResult.data.farmId,
         },
-        calfShipments: shippedCalves.map((calf) => ({
-          id: calf.id,
-          individualNumber: calf.individualNumber,
-          calfName: calf.calfName,
-          damName: calf.damName,
-          damId: calf.damId,
-          damIndividualNumber: calf.damIndividualNumber ?? null,
-          birthDate: calf.birthDate,
-          // 血統情報
-          sirePedigree: calf.sirePedigree ?? null,
-          maternalGrandsire: calf.maternalGrandsire ?? null,
-          maternalGreatGrandsire: calf.maternalGreatGrandsire ?? null,
-          maternalGreatGreatGrandsire: calf.maternalGreatGreatGrandsire ?? null,
-          // 繁殖・出産情報
-          matingDate: calf.matingDate ?? null,
-          expectedBirthDate: calf.expectedBirthDate ?? null,
-          auctionDate: calf.auctionDate ?? null,
-          matingInterval: calf.matingInterval ?? null,
-          // 個体情報
-          weight: calf.weight ?? null,
-          ageInDays: calculateAgeInDays(calf.birthDate),
-          gender: calf.gender,
-          // 取引情報
-          price: calf.price ?? null,
-          buyer: calf.buyer ?? null,
-          remarks: calf.remarks ?? null,
-          // その他
-          farmId: calf.farmId,
-          healthStatus: calf.healthStatus,
-          createdAt: calf.createdAt,
-          updatedAt: calf.updatedAt,
-        })),
+        calfShipments: shippedCalves.map((calf) => {
+          const mappedCalf = {
+            id: calf.id,
+            individualNumber: calf.individualNumber,
+            calfName: calf.calfName,
+            damName: calf.damName,
+            damId: calf.damId,
+            damIndividualNumber: calf.damIndividualNumber ?? null,
+            birthDate: calf.birthDate,
+            // 血統情報
+            sirePedigree: calf.sirePedigree ?? null,
+            maternalGrandsire: calf.maternalGrandsire ?? null,
+            maternalGreatGrandsire: calf.maternalGreatGrandsire ?? null,
+            maternalGreatGreatGrandsire: calf.maternalGreatGreatGrandsire ?? null,
+            // 繁殖・出産情報
+            matingDate: calf.matingDate ?? null,
+            expectedBirthDate: calf.expectedBirthDate ?? null,
+            auctionDate: calf.auctionDate ?? null,
+            matingInterval: calf.matingInterval ?? null,
+            // 個体情報
+            weight: calf.weight ?? null,
+            ageInDays: calculateAgeInDays(calf.birthDate),
+            gender: calf.gender,
+            // 取引情報
+            price: calf.price ?? null,
+            buyer: calf.buyer ?? null,
+            remarks: calf.remarks ?? null,
+            // その他
+            farmId: calf.farmId,
+            healthStatus: calf.healthStatus,
+            createdAt: calf.createdAt,
+            updatedAt: calf.updatedAt,
+          };
+          return mappedCalf;
+        }),
         statistics,
       };
 

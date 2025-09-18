@@ -5,7 +5,7 @@ export interface CalfShipment {
   individualNumber: string;
   calfName: string;
   damName: string | null;
-  damId: string;
+  damId: string | null;
   damIndividualNumber: string | null;
   birthDate: string;
   // 血統情報

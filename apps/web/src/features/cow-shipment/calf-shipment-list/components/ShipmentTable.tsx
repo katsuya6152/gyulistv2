@@ -16,6 +16,8 @@ interface ShipmentTableProps {
   onUpdate: (id: string, updates: UpdateCalfShipmentParams) => void;
   onCancelShipment: (id: string) => void;
   onFieldUpdate: (id: string, field: keyof UpdateCalfShipmentParams, value: string | number | null) => void;
+  onNewRowFieldUpdate: (id: string, field: keyof CalfShipment, value: string | number | null) => void;
+  onSaveNewRow: (id: string) => void;
   onRemoveNewRow: (id: string) => void;
 }
 
@@ -29,6 +31,8 @@ export function ShipmentTable({
   onUpdate,
   onCancelShipment,
   onFieldUpdate,
+  onNewRowFieldUpdate,
+  onSaveNewRow,
   onRemoveNewRow,
 }: ShipmentTableProps) {
   const [savingRows, setSavingRows] = useState<Set<string>>(new Set());
@@ -100,14 +104,14 @@ export function ShipmentTable({
   };
 
   // 保留中の変更を取得する関数
-  const getPendingValue = (id: string, field: keyof UpdateCalfShipmentParams, defaultValue: any) => {
+  const getPendingValue = (id: string, field: keyof UpdateCalfShipmentParams, defaultValue: string | number | null) => {
     const pendingChange = pendingChanges.find((change) => change.id === id);
     return pendingChange?.[field] !== undefined ? pendingChange[field] : defaultValue;
   };
 
   return (
     <div className="overflow-x-auto overflow-y-visible">
-      <table className="w-full min-w-[1400px] border-collapse">
+      <table className="w-full min-w-[1800px] border-collapse">
         <thead>
           <tr className="border-b">
             <th className="text-left p-3 font-medium whitespace-nowrap">個体番号</th>
@@ -125,6 +129,8 @@ export function ShipmentTable({
             <th className="text-left p-3 font-medium whitespace-nowrap">購買者</th>
             <th className="text-left p-3 font-medium whitespace-nowrap">父牛血統</th>
             <th className="text-left p-3 font-medium whitespace-nowrap">母の父血統</th>
+            <th className="text-left p-3 font-medium whitespace-nowrap">母の祖父血統</th>
+            <th className="text-left p-3 font-medium whitespace-nowrap">母の母の祖父血統</th>
             <th className="text-left p-3 font-medium whitespace-nowrap">健康状態</th>
             <th className="text-left p-3 font-medium whitespace-nowrap">備考</th>
             <th className="text-left p-3 font-medium whitespace-nowrap">状態</th>
@@ -205,6 +211,12 @@ export function ShipmentTable({
                 <td className="p-3 whitespace-nowrap" title={calf.maternalGrandsire || ""}>
                   {calf.maternalGrandsire ? <span className="truncate block max-w-24">{calf.maternalGrandsire}</span> : "-"}
                 </td>
+                <td className="p-3 whitespace-nowrap" title={calf.maternalGreatGrandsire || ""}>
+                  {calf.maternalGreatGrandsire ? <span className="truncate block max-w-24">{calf.maternalGreatGrandsire}</span> : "-"}
+                </td>
+                <td className="p-3 whitespace-nowrap" title={calf.maternalGreatGreatGrandsire || ""}>
+                  {calf.maternalGreatGreatGrandsire ? <span className="truncate block max-w-24">{calf.maternalGreatGreatGrandsire}</span> : "-"}
+                </td>
                 <td className="p-3 whitespace-nowrap">
                   <Badge variant={calf.healthStatus === "HEALTHY" ? "default" : "destructive"}>
                     {calf.healthStatus === "HEALTHY" ? "健康" : "要確認"}
@@ -259,9 +271,7 @@ export function ShipmentTable({
               <td className="p-3">
                 <Input
                   value={row.data.individualNumber || ""}
-                  onChange={() => {
-                    // 新規行の更新ロジック
-                  }}
+                  onChange={(e) => onNewRowFieldUpdate(row.id, "individualNumber", e.target.value)}
                   placeholder="個体番号"
                   className="w-24"
                 />
@@ -269,9 +279,7 @@ export function ShipmentTable({
               <td className="p-3">
                 <Input
                   value={row.data.calfName || ""}
-                  onChange={() => {
-                    // 新規行の更新ロジック
-                  }}
+                  onChange={(e) => onNewRowFieldUpdate(row.id, "calfName", e.target.value)}
                   placeholder="子牛名"
                   className="w-24"
                 />
@@ -279,9 +287,7 @@ export function ShipmentTable({
               <td className="p-3">
                 <Input
                   value={row.data.damName || ""}
-                  onChange={() => {
-                    // 新規行の更新ロジック
-                  }}
+                  onChange={(e) => onNewRowFieldUpdate(row.id, "damName", e.target.value)}
                   placeholder="母牛名"
                   className="w-24"
                 />
@@ -290,18 +296,14 @@ export function ShipmentTable({
                 <Input
                   type="date"
                   value={row.data.birthDate || ""}
-                  onChange={() => {
-                    // 新規行の更新ロジック
-                  }}
+                  onChange={(e) => onNewRowFieldUpdate(row.id, "birthDate", e.target.value)}
                   className="w-32"
                 />
               </td>
               <td className="p-3">
                 <select
                   value={row.data.gender || "MALE"}
-                  onChange={() => {
-                    // 新規行の更新ロジック
-                  }}
+                  onChange={(e) => onNewRowFieldUpdate(row.id, "gender", e.target.value as "MALE" | "FEMALE" | "CASTRATED")}
                   className="w-20 border rounded px-2 py-1"
                 >
                   <option value="MALE">オス</option>
@@ -314,9 +316,7 @@ export function ShipmentTable({
                   type="number"
                   step="0.1"
                   value={row.data.weight || ""}
-                  onChange={() => {
-                    // 新規行の更新ロジック
-                  }}
+                  onChange={(e) => onNewRowFieldUpdate(row.id, "weight", e.target.value ? Number.parseFloat(e.target.value) : null)}
                   placeholder="体重"
                   className="w-20"
                 />
@@ -325,9 +325,7 @@ export function ShipmentTable({
                 <Input
                   type="date"
                   value={row.data.auctionDate || ""}
-                  onChange={() => {
-                    // 新規行の更新ロジック
-                  }}
+                  onChange={(e) => onNewRowFieldUpdate(row.id, "auctionDate", e.target.value)}
                   className="w-32"
                 />
               </td>
@@ -335,9 +333,7 @@ export function ShipmentTable({
                 <Input
                   type="number"
                   value={row.data.price || ""}
-                  onChange={() => {
-                    // 新規行の更新ロジック
-                  }}
+                  onChange={(e) => onNewRowFieldUpdate(row.id, "price", e.target.value ? Number.parseFloat(e.target.value) : null)}
                   placeholder="価格"
                   className="w-24"
                 />
@@ -345,19 +341,50 @@ export function ShipmentTable({
               <td className="p-3">
                 <Input
                   value={row.data.buyer || ""}
-                  onChange={() => {
-                    // 新規行の更新ロジック
-                  }}
+                  onChange={(e) => onNewRowFieldUpdate(row.id, "buyer", e.target.value)}
                   placeholder="購買者"
                   className="w-32"
                 />
               </td>
               <td className="p-3">
                 <Input
+                  value={row.data.sirePedigree || ""}
+                  onChange={(e) => onNewRowFieldUpdate(row.id, "sirePedigree", e.target.value)}
+                  placeholder="父牛血統"
+                  className="w-24"
+                />
+              </td>
+              <td className="p-3">
+                <Input
+                  value={row.data.maternalGrandsire || ""}
+                  onChange={(e) => onNewRowFieldUpdate(row.id, "maternalGrandsire", e.target.value)}
+                  placeholder="母の父血統"
+                  className="w-24"
+                />
+              </td>
+              <td className="p-3">
+                <Input
+                  value={row.data.maternalGreatGrandsire || ""}
+                  onChange={(e) => onNewRowFieldUpdate(row.id, "maternalGreatGrandsire", e.target.value)}
+                  placeholder="母の祖父血統"
+                  className="w-24"
+                />
+              </td>
+              <td className="p-3">
+                <Input
+                  value={row.data.maternalGreatGreatGrandsire || ""}
+                  onChange={(e) => onNewRowFieldUpdate(row.id, "maternalGreatGreatGrandsire", e.target.value)}
+                  placeholder="母の母の祖父血統"
+                  className="w-24"
+                />
+              </td>
+              <td className="p-3">
+                <Badge variant="default">健康</Badge>
+              </td>
+              <td className="p-3">
+                <Input
                   value={row.data.remarks || ""}
-                  onChange={() => {
-                    // 新規行の更新ロジック
-                  }}
+                  onChange={(e) => onNewRowFieldUpdate(row.id, "remarks", e.target.value)}
                   placeholder="備考"
                   className="w-32"
                 />
@@ -367,12 +394,7 @@ export function ShipmentTable({
               </td>
               <td className="p-3">
                 <div className="flex gap-1">
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      // 新規行の保存ロジック
-                    }}
-                  >
+                  <Button size="sm" onClick={() => onSaveNewRow(row.id)}>
                     保存
                   </Button>
                   <Button size="sm" variant="outline" onClick={() => onRemoveNewRow(row.id)}>

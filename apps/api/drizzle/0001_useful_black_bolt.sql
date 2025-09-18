@@ -1,0 +1,1 @@
+ALTER TABLE "calves" ALTER COLUMN "cow_id" DROP NOT NULL;
