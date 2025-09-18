@@ -1,9 +1,371 @@
 {
-  "id": "8b833c09-d9ff-44e6-acc7-18c2fdb60925",
+  "id": "e436a6ee-d861-4852-a741-73769979661a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.calves": {
+      "name": "calves",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "individual_number": {
+          "name": "individual_number",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "calf_name": {
+          "name": "calf_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dam_name": {
+          "name": "dam_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dam_individual_number": {
+          "name": "dam_individual_number",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sire_pedigree": {
+          "name": "sire_pedigree",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "maternal_grandsire": {
+          "name": "maternal_grandsire",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "maternal_great_grandsire": {
+          "name": "maternal_great_grandsire",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "maternal_great_great_grandsire": {
+          "name": "maternal_great_great_grandsire",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mating_date": {
+          "name": "mating_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "expected_birth_date": {
+          "name": "expected_birth_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "birth_date": {
+          "name": "birth_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "auction_date": {
+          "name": "auction_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mating_interval": {
+          "name": "mating_interval",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "weight": {
+          "name": "weight",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "age_in_days": {
+          "name": "age_in_days",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gender": {
+          "name": "gender",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "price": {
+          "name": "price",
+          "type": "numeric(12, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "buyer": {
+          "name": "buyer",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "remarks": {
+          "name": "remarks",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cow_id": {
+          "name": "cow_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "health_status": {
+          "name": "health_status",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'HEALTHY'"
+        },
+        "farm_id": {
+          "name": "farm_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "calves_cow_id_cows_id_fk": {
+          "name": "calves_cow_id_cows_id_fk",
+          "tableFrom": "calves",
+          "tableTo": "cows",
+          "columnsFrom": [
+            "cow_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "calves_farm_id_farms_id_fk": {
+          "name": "calves_farm_id_farms_id_fk",
+          "tableFrom": "calves",
+          "tableTo": "farms",
+          "columnsFrom": [
+            "farm_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "calves_individual_number_unique": {
+          "name": "calves_individual_number_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "individual_number"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.cows": {
+      "name": "cows",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "individual_number": {
+          "name": "individual_number",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "birth_date": {
+          "name": "birth_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sire_pedigree": {
+          "name": "sire_pedigree",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "maternal_grandsire": {
+          "name": "maternal_grandsire",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "maternal_great_grandsire": {
+          "name": "maternal_great_grandsire",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "maternal_great_great_grandsire": {
+          "name": "maternal_great_great_grandsire",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dam_name": {
+          "name": "dam_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dam_registration_number": {
+          "name": "dam_registration_number",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "maternal_score": {
+          "name": "maternal_score",
+          "type": "numeric(5, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "registration_symbol_number": {
+          "name": "registration_symbol_number",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "producer_name": {
+          "name": "producer_name",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "individual_identification_number": {
+          "name": "individual_identification_number",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "auction_date": {
+          "name": "auction_date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "health_status": {
+          "name": "health_status",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'HEALTHY'"
+        },
+        "farm_id": {
+          "name": "farm_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "cows_farm_id_farms_id_fk": {
+          "name": "cows_farm_id_farms_id_fk",
+          "tableFrom": "cows",
+          "tableTo": "farms",
+          "columnsFrom": [
+            "farm_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "cows_individual_number_unique": {
+          "name": "cows_individual_number_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "individual_number"
+          ]
+        },
+        "cows_individual_identification_number_unique": {
+          "name": "cows_individual_identification_number_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "individual_identification_number"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.farms": {
       "name": "farms",
       "schema": "",

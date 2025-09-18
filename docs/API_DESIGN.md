@@ -24,27 +24,10 @@
 
 ### 2.2 サブドメイン
 - **個体管理**: 母牛・子牛の登録・管理
-- **繁殖記録**: 交配・妊娠・分娩記録
-- **血統管理**: 血統マスタ・系統マスタの管理
 - **出荷管理**: 出荷記録の管理
-- **せり管理**: せり自体・牛のせり結果の管理
-- **イベント管理**: 繁殖・出荷・せり等のイベント管理
 - **認証・認可**: ユーザー認証とアクセス制御
 - **ダッシュボード**: 総合的な経営状況の可視化
 - **分析・レポート**: 繁殖成績の分析
-
-### 2.3 境界づけられたコンテキスト
-```
-         ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-         │   出荷管理      │    │   せり管理      │    │   イベント管理  │
-         │   Context       │    │   Context       │    │   Context       │
-         └─────────────────┘    └─────────────────┘    └─────────────────┘
-                                 │
-         ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-         │   認証・認可    │    │   ダッシュボード │    │   分析・レポート │
-         │   Context       │    │   Context       │    │   Context       │
-         └─────────────────┘    └─────────────────┘    └─────────────────┘
-```
 
 ## 3. エンティティとバリューオブジェクト
 
@@ -56,121 +39,54 @@
   - 個体番号: IndividualNumber
   - 名前: Name
   - 生年月日: BirthDate
-  - 血統ID: PedigreeId
-  - 健康状態: HealthStatus
   - 農場ID: FarmId
 
 - **Calf（子牛）**
   - ID: CalfId
   - 個体番号: IndividualNumber
-  - 名前: Name
+  - 名号: CalfName
+  - 血統情報: PedigreeInfo
+    - 父牛: SirePedigree
+    - 母の父: MaternalGrandsire
+    - 母の祖父: MaternalGreatGrandsire
+    - 母の母の祖父: MaternalGreatGreatGrandsire
+  - 種付年月日: MatingDate
+  - 出産予定日: ExpectedBirthDate
   - 生年月日: BirthDate
+  - せり年月日: AuctionDate
+  - 種付け間隔: MatingInterval
+  - 体重: Weight
+  - 日齢: AgeInDays
+  - 性別: Gender
+  - 価格: Price
+  - 購買者: Buyer
+  - 備考: Remarks
   - 母牛ID: CowId
-  - 血統ID: PedigreeId
-  - 健康状態: HealthStatus
   - 農場ID: FarmId
 
 #### バリューオブジェクト
 - **IndividualNumber**: 個体番号（不変）
 - **Name**: 名前（不変）
+- **CalfName**: 子牛名号（不変）
+- **PedigreeInfo**: 血統情報（不変）
+  - **SirePedigree**: 父牛血統（不変）
+  - **MaternalGrandsire**: 母の父血統（不変）
+  - **MaternalGreatGrandsire**: 母の祖父血統（不変）
+  - **MaternalGreatGreatGrandsire**: 母の母の祖父血統（不変）
+- **MatingDate**: 種付年月日（不変）
+- **ExpectedBirthDate**: 出産予定日（不変）
 - **BirthDate**: 生年月日（不変）
+- **AuctionDate**: せり年月日（不変）
+- **MatingInterval**: 種付け間隔（不変）
+- **Weight**: 体重（不変）
+- **AgeInDays**: 日齢（不変）
+- **Gender**: 性別（不変）
+- **Price**: 価格（不変）
+- **Buyer**: 購買者（不変）
+- **Remarks**: 備考（不変）
 - **HealthStatus**: 健康状態（不変）
 
-### 3.2 血統管理ドメイン
-
-#### エンティティ
-- **PedigreeMaster（血統マスタ）**
-  - ID: PedigreeMasterId
-  - 血統名: PedigreeName
-  - 血統番号: PedigreeNumber
-  - 系統ID: LineageId
-  - 登録日: RegistrationDate
-
-- **LineageMaster（系統マスタ）**
-  - ID: LineageMasterId
-  - 系統名: LineageName
-  - 系統番号: LineageNumber
-  - 説明: Description
-
-- **Pedigree（血統）**
-  - ID: PedigreeId
-  - 個体ID: IndividualId
-  - 血統マスタID: PedigreeMasterId
-  - 父牛血統ID: SirePedigreeId
-  - 母牛血統ID: DamPedigreeId
-  - 血統係数: InbreedingCoefficient
-
-#### バリューオブジェクト
-- **PedigreeName**: 血統名（不変）
-- **PedigreeNumber**: 血統番号（不変）
-- **LineageName**: 系統名（不変）
-- **LineageNumber**: 系統番号（不変）
-- **InbreedingCoefficient**: 血統係数（不変）
-
-### 3.3 出荷管理ドメイン
-
-#### エンティティ
-- **Shipment（出荷）**
-  - ID: ShipmentId
-  - 個体ID: IndividualId
-  - 出荷日: ShipmentDate
-  - 出荷先: Destination
-  - 重量: Weight
-  - 価格: Price
-  - 出荷区分: ShipmentType
-  - 農場ID: FarmId
-
-#### バリューオブジェクト
-- **ShipmentDate**: 出荷日（不変）
-- **Destination**: 出荷先（不変）
-- **Weight**: 重量（不変）
-- **Price**: 価格（不変）
-- **ShipmentType**: 出荷区分（不変）
-
-### 3.4 せり管理ドメイン
-
-#### エンティティ
-- **Auction（せり自体）**
-  - ID: AuctionId
-  - せり名: AuctionName
-  - せり日: AuctionDate
-  - せり場: AuctionHouse
-  - せり番号: AuctionNumber
-  - 状態: Status
-
-- **AuctionResult（牛のせり結果）**
-  - ID: AuctionResultId
-  - せりID: AuctionId
-  - 個体ID: IndividualId
-  - 落札価格: WinningBid
-  - 落札者: Winner
-  - 結果: Result
-
-#### バリューオブジェクト
-- **AuctionName**: せり名（不変）
-- **AuctionDate**: せり日（不変）
-- **AuctionHouse**: せり場（不変）
-- **AuctionNumber**: せり番号（不変）
-- **WinningBid**: 落札価格（不変）
-- **Winner**: 落札者（不変）
-
-### 3.5 イベント管理ドメイン
-
-#### エンティティ
-- **Event（イベント）**
-  - ID: EventId
-  - イベント種別: EventType
-  - 個体ID: IndividualId
-  - イベント日: EventDate
-  - 詳細: Details
-  - 農場ID: FarmId
-
-#### バリューオブジェクト
-- **EventType**: イベント種別（不変）
-- **EventDate**: イベント日（不変）
-- **Details**: 詳細（不変）
-
-### 3.6 認証・認可ドメイン
+### 3.2 認証・認可ドメイン
 
 #### エンティティ
 - **User（ユーザー）**
@@ -284,6 +200,28 @@ export interface Cow {
   readonly farmId: FarmId;
 }
 
+export interface Calf {
+  readonly id: CalfId;
+  readonly individualNumber: IndividualNumber;
+  readonly calfName: CalfName;
+  readonly pedigreeInfo: PedigreeInfo;
+  readonly matingDate: MatingDate;
+  readonly expectedBirthDate: ExpectedBirthDate;
+  readonly birthDate: BirthDate;
+  readonly auctionDate: AuctionDate;
+  readonly matingInterval: MatingInterval;
+  readonly weight: Weight;
+  readonly ageInDays: AgeInDays;
+  readonly gender: Gender;
+  readonly price: Price;
+  readonly buyer: Buyer;
+  readonly remarks: Remarks;
+  readonly cowId: CowId;
+  readonly pedigreeId: PedigreeId;
+  readonly healthStatus: HealthStatus;
+  readonly farmId: FarmId;
+}
+
 // エンティティの作成関数（純粋関数）
 export const createCow = (
   individualNumber: IndividualNumber,
@@ -300,6 +238,46 @@ export const createCow = (
   healthStatus: 'HEALTHY' as const,
   farmId
 });
+
+export const createCalf = (
+  individualNumber: IndividualNumber,
+  calfName: CalfName,
+  pedigreeInfo: PedigreeInfo,
+  matingDate: MatingDate,
+  expectedBirthDate: ExpectedBirthDate,
+  birthDate: BirthDate,
+  auctionDate: AuctionDate,
+  matingInterval: MatingInterval,
+  weight: Weight,
+  ageInDays: AgeInDays,
+  gender: Gender,
+  price: Price,
+  buyer: Buyer,
+  remarks: Remarks,
+  cowId: CowId,
+  pedigreeId: PedigreeId,
+  farmId: FarmId
+): Calf => ({
+  id: generateCalfId(),
+  individualNumber,
+  calfName,
+  pedigreeInfo,
+  matingDate,
+  expectedBirthDate,
+  birthDate,
+  auctionDate,
+  matingInterval,
+  weight,
+  ageInDays,
+  gender,
+  price,
+  buyer,
+  remarks,
+  cowId,
+  pedigreeId,
+  healthStatus: 'HEALTHY' as const,
+  farmId
+});
 ```
 
 #### value-objects/ - バリューオブジェクト（不変データ）
@@ -309,9 +287,95 @@ export interface IndividualNumber {
   readonly value: string;
 }
 
+export interface CalfName {
+  readonly value: string;
+}
+
+export interface PedigreeInfo {
+  readonly sirePedigree: SirePedigree;
+  readonly maternalGrandsire: MaternalGrandsire;
+  readonly maternalGreatGrandsire: MaternalGreatGrandsire;
+  readonly maternalGreatGreatGrandsire: MaternalGreatGreatGrandsire;
+}
+
+export interface MatingDate {
+  readonly value: Date;
+}
+
+export interface ExpectedBirthDate {
+  readonly value: Date;
+}
+
+export interface AuctionDate {
+  readonly value: Date;
+}
+
+export interface MatingInterval {
+  readonly value: number; // 日数
+}
+
+export interface Weight {
+  readonly value: number; // kg
+}
+
+export interface AgeInDays {
+  readonly value: number;
+}
+
+export interface Gender {
+  readonly value: 'MALE' | 'FEMALE' | 'CASTRATED';
+}
+
+export interface Price {
+  readonly value: number; // 円
+}
+
+export interface Buyer {
+  readonly value: string;
+}
+
+export interface Remarks {
+  readonly value: string;
+}
+
 export const createIndividualNumber = (value: string): Result<IndividualNumber, ValidationError> => {
   if (!value || value.length < 3) {
     return { success: false, error: 'Invalid individual number' };
+  }
+  return { success: true, data: { value } };
+};
+
+export const createCalfName = (value: string): Result<CalfName, ValidationError> => {
+  if (!value || value.trim().length === 0) {
+    return { success: false, error: 'Calf name is required' };
+  }
+  return { success: true, data: { value: value.trim() } };
+};
+
+export const createWeight = (value: number): Result<Weight, ValidationError> => {
+  if (value <= 0) {
+    return { success: false, error: 'Weight must be positive' };
+  }
+  return { success: true, data: { value } };
+};
+
+export const createAgeInDays = (value: number): Result<AgeInDays, ValidationError> => {
+  if (value < 0) {
+    return { success: false, error: 'Age in days must be non-negative' };
+  }
+  return { success: true, data: { value } };
+};
+
+export const createGender = (value: string): Result<Gender, ValidationError> => {
+  if (value !== 'MALE' && value !== 'FEMALE' && value !== 'CASTRATED') {
+    return { success: false, error: 'Gender must be MALE, FEMALE, or CASTRATED' };
+  }
+  return { success: true, data: { value: value as 'MALE' | 'FEMALE' | 'CASTRATED' } };
+};
+
+export const createPrice = (value: number): Result<Price, ValidationError> => {
+  if (value < 0) {
+    return { success: false, error: 'Price must be non-negative' };
   }
   return { success: true, data: { value } };
 };
@@ -800,109 +864,30 @@ CREATE TABLE cows (
 CREATE TABLE calves (
   id UUID PRIMARY KEY,
   individual_number VARCHAR(20) UNIQUE NOT NULL,
-  name VARCHAR(100) NOT NULL,
+  calf_name VARCHAR(100) NOT NULL, -- 名号
+  -- 血統情報
+  sire_pedigree VARCHAR(200), -- 父牛血統
+  maternal_grandsire VARCHAR(200), -- 母の父血統
+  maternal_great_grandsire VARCHAR(200), -- 母の祖父血統
+  maternal_great_great_grandsire VARCHAR(200), -- 母の母の祖父血統
+  -- 繁殖・出産情報
+  mating_date DATE, -- 種付年月日
+  expected_birth_date DATE, -- 出産予定日
   birth_date DATE NOT NULL,
+  auction_date DATE, -- せり年月日
+  mating_interval INTEGER, -- 種付け間隔（日数）
+  -- 個体情報
+  weight DECIMAL(8,2), -- 体重（kg）
+  age_in_days INTEGER, -- 日齢
+  gender VARCHAR(10) NOT NULL, -- 性別（MALE/FEMALE/CASTRATED）
+  -- 取引情報
+  price DECIMAL(12,2), -- 価格（円）
+  buyer VARCHAR(200), -- 購買者
+  remarks TEXT, -- 備考
+  -- その他
   cow_id UUID NOT NULL,
   pedigree_id UUID,
   health_status VARCHAR(20) NOT NULL,
-  farm_id UUID NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-```
-
-#### pedigree_masters テーブル
-```sql
-CREATE TABLE pedigree_masters (
-  id UUID PRIMARY KEY,
-  pedigree_name VARCHAR(200) NOT NULL,
-  pedigree_number VARCHAR(50) UNIQUE NOT NULL,
-  lineage_id UUID NOT NULL,
-  registration_date DATE NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-```
-
-#### lineage_masters テーブル
-```sql
-CREATE TABLE lineage_masters (
-  id UUID PRIMARY KEY,
-  lineage_name VARCHAR(200) NOT NULL,
-  lineage_number VARCHAR(50) UNIQUE NOT NULL,
-  description TEXT,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-```
-
-#### pedigrees テーブル
-```sql
-CREATE TABLE pedigrees (
-  id UUID PRIMARY KEY,
-  individual_id UUID NOT NULL,
-  individual_type VARCHAR(10) NOT NULL, -- 'cow' or 'calf'
-  pedigree_master_id UUID NOT NULL,
-  sire_pedigree_id UUID,
-  dam_pedigree_id UUID,
-  inbreeding_coefficient DECIMAL(5,4),
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-```
-
-#### shipments テーブル
-```sql
-CREATE TABLE shipments (
-  id UUID PRIMARY KEY,
-  individual_id UUID NOT NULL,
-  shipment_date DATE NOT NULL,
-  destination VARCHAR(200) NOT NULL,
-  weight DECIMAL(8,2) NOT NULL,
-  price DECIMAL(12,2) NOT NULL,
-  shipment_type VARCHAR(20) NOT NULL,
-  farm_id UUID NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-```
-
-#### auctions テーブル
-```sql
-CREATE TABLE auctions (
-  id UUID PRIMARY KEY,
-  auction_name VARCHAR(200) NOT NULL,
-  auction_date DATE NOT NULL,
-  auction_house VARCHAR(200) NOT NULL,
-  auction_number VARCHAR(50) NOT NULL,
-  status VARCHAR(20) NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-```
-
-#### auction_results テーブル
-```sql
-CREATE TABLE auction_results (
-  id UUID PRIMARY KEY,
-  auction_id UUID NOT NULL,
-  individual_id UUID NOT NULL,
-  winning_bid DECIMAL(12,2) NOT NULL,
-  winner VARCHAR(200) NOT NULL,
-  result VARCHAR(20) NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-```
-
-#### events テーブル
-```sql
-CREATE TABLE events (
-  id UUID PRIMARY KEY,
-  event_type VARCHAR(50) NOT NULL,
-  individual_id UUID NOT NULL,
-  event_date DATE NOT NULL,
-  details TEXT,
   farm_id UUID NOT NULL,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
@@ -917,18 +902,6 @@ CREATE TABLE users (
   password_hash VARCHAR(255) NOT NULL,
   role VARCHAR(20) NOT NULL DEFAULT 'farmer',
   farm_id UUID NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-```
-
-#### farms テーブル
-```sql
-CREATE TABLE farms (
-  id UUID PRIMARY KEY,
-  farm_name VARCHAR(200) NOT NULL,
-  address TEXT,
-  phone_number VARCHAR(20),
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );

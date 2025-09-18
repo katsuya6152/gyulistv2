@@ -19,7 +19,7 @@ class AuthService {
     const result = await response.json();
 
     if (!result.success) {
-      throw new Error(result.error || "Login failed");
+      throw new Error("error" in result ? result.error : "Login failed");
     }
 
     return result;
@@ -33,7 +33,7 @@ class AuthService {
     const result = await response.json();
 
     if (!result.success) {
-      throw new Error(result.error || "Registration failed");
+      throw new Error("error" in result ? result.error : "Registration failed");
     }
 
     return result;
@@ -49,7 +49,7 @@ class AuthService {
     const result = await response.json();
 
     if (!result.success) {
-      throw new Error(result.error || "Token verification failed");
+      throw new Error("error" in result ? result.error : "Token verification failed");
     }
 
     return result;
