@@ -1,7 +1,7 @@
 // インライン編集フック
 
 import type { CalfShipment, UpdateCalfShipmentParams } from "@/types/calf-shipment";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 // interface EditingRow {
 //   id: string;
@@ -13,10 +13,42 @@ interface NewRow {
   data: Partial<CalfShipment>;
 }
 
+interface Cow {
+  id: string;
+  individualNumber: string;
+  name: string;
+  birthDate: string;
+  gender: string;
+}
+
 export function useInlineEditing() {
   const [editingRows, setEditingRows] = useState<Set<string>>(new Set());
   const [newRows, setNewRows] = useState<NewRow[]>([]);
   const [pendingChanges, setPendingChanges] = useState<UpdateCalfShipmentParams[]>([]);
+  const [cows, setCows] = useState<Cow[]>([]);
+  const [cowsLoading, setCowsLoading] = useState(false);
+
+  // 母牛一覧を取得
+  const loadCows = useCallback(
+    async (farmId: string) => {
+      if (cows.length > 0) return; // 既に読み込まれている場合はスキップ
+
+      setCowsLoading(true);
+      try {
+        const { getCowsAction } = await import("../actions");
+        const result = await getCowsAction(farmId);
+
+        if (result.success && result.data) {
+          setCows(result.data);
+        }
+      } catch (error) {
+        console.error("Failed to load cows:", error);
+      } finally {
+        setCowsLoading(false);
+      }
+    },
+    [cows.length]
+  );
 
   // 編集開始
   const startEditing = useCallback((id: string) => {
@@ -67,26 +99,57 @@ export function useInlineEditing() {
     );
   }, []);
 
+  // 母牛選択
+  const selectCow = useCallback(
+    (id: string, cowId: string) => {
+      const selectedCow = cows.find((cow) => cow.id === cowId);
+      if (selectedCow) {
+        setNewRows((prev) =>
+          prev.map((row) =>
+            row.id === id
+              ? {
+                  ...row,
+                  data: {
+                    ...row.data,
+                    damId: cowId,
+                    damName: selectedCow.name,
+                  },
+                }
+              : row
+          )
+        );
+      }
+    },
+    [cows]
+  );
+
   // 新規行追加
-  const addNewRow = useCallback(() => {
-    const newId = `new-${Date.now()}`;
-    const newRow: NewRow = {
-      id: newId,
-      data: {
-        individualNumber: "",
-        calfName: "",
-        damName: "",
-        birthDate: "",
-        gender: "MALE",
-        weight: null,
-        auctionDate: null,
-        price: null,
-        buyer: null,
-        remarks: null,
-      },
-    };
-    setNewRows((prev) => [...prev, newRow]);
-  }, []);
+  const addNewRow = useCallback(
+    (farmId: string) => {
+      // 母牛一覧を読み込む
+      loadCows(farmId);
+
+      const newId = `new-${Date.now()}`;
+      const newRow: NewRow = {
+        id: newId,
+        data: {
+          individualNumber: "",
+          calfName: "",
+          damName: "",
+          damId: null,
+          birthDate: "",
+          gender: "MALE",
+          weight: null,
+          auctionDate: null,
+          price: null,
+          buyer: null,
+          remarks: null,
+        },
+      };
+      setNewRows((prev) => [...prev, newRow]);
+    },
+    [loadCows]
+  );
 
   // 新規行削除
   const removeNewRow = useCallback((id: string) => {
@@ -199,6 +262,8 @@ export function useInlineEditing() {
     editingRows,
     newRows,
     pendingChanges,
+    cows,
+    cowsLoading,
     startEditing,
     cancelEditing,
     saveChanges,
@@ -208,5 +273,6 @@ export function useInlineEditing() {
     saveNewRow,
     updateField,
     updateNewRowField,
+    selectCow,
   };
 }

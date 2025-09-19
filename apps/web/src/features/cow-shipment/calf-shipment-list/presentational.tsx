@@ -2,9 +2,10 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import type { CalfShipment, GetCalfShipmentsSuccess, ShipmentFilters, UpdateCalfShipmentParams } from "@/types/calf-shipment";
+import { Check, ChevronRight, FileText, Home, Plus } from "lucide-react";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { batchUpdateCalfShipmentsAction, cancelCalfShipmentAction, getCalfShipmentsAction, updateCalfShipmentAction } from "./actions";
 import { ErrorMessage } from "./components/ErrorMessage";
@@ -102,6 +103,9 @@ export default function CalfShipmentListPresentation({ initialData, filters, lim
     saveNewRow,
     updateField,
     updateNewRowField,
+    cows,
+    cowsLoading,
+    selectCow,
   } = useInlineEditing();
 
   // 個別更新の処理
@@ -200,40 +204,86 @@ export default function CalfShipmentListPresentation({ initialData, filters, lim
   }, [pendingChanges, currentFilters, calves.length, saveChanges]);
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">子牛出荷管理</h1>
-        <div className="flex gap-2">
-          <Button onClick={addNewRow} variant="outline">
-            新規追加
-          </Button>
-          {pendingChanges.length > 0 && (
-            <Button onClick={handleBatchSave} className="bg-blue-600 hover:bg-blue-700">
-              一括保存 ({pendingChanges.length})
-            </Button>
-          )}
+    <div className="min-h-screen bg-gray-50/50">
+      <div className="max-w-7xl mx-auto px-2 sm:px-3 lg:px-4 py-6">
+        {/* ブレッドクラム */}
+        <nav className="flex mb-4" aria-label="Breadcrumb">
+          <ol className="inline-flex items-center space-x-1 md:space-x-3">
+            <li className="inline-flex items-center">
+              <Link href="/dashboard" className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                <Home className="w-3 h-3 mr-2.5" />
+                ダッシュボード
+              </Link>
+            </li>
+            <li>
+              <div className="flex items-center">
+                <ChevronRight className="w-3 h-3 text-gray-400 mx-1" />
+                <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">出荷管理</span>
+              </div>
+            </li>
+            <li aria-current="page">
+              <div className="flex items-center">
+                <ChevronRight className="w-3 h-3 text-gray-400 mx-1" />
+                <span className="ml-1 text-sm font-medium text-gray-500 md:ml-2">子牛一覧</span>
+              </div>
+            </li>
+          </ol>
+        </nav>
+
+        {/* ヘッダーセクション（フィルター含む） */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between gap-4 mb-3">
+            <div className="flex items-center gap-3">
+              <h2 className="text-lg font-semibold text-gray-900">子牛出荷管理</h2>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <ShipmentFiltersComponent filters={currentFilters} onFilterChange={handleFilterChange} isLoading={isLoading} />
+        {/* エラーメッセージ */}
+        {error && (
+          <div className="mb-4">
+            <ErrorMessage message={error} onDismiss={() => setError(null)} />
+          </div>
+        )}
 
-      {error && <ErrorMessage message={error} onDismiss={() => setError(null)} />}
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>出荷一覧</span>
-            <Badge variant="secondary">
+        {/* テーブル上部のアクションバー */}
+        <div className="flex justify-between items-center mb-3">
+          <div className="flex items-center gap-2">
+            <FileText className="w-4 h-4 text-gray-600" />
+            <span className="text-sm font-medium text-gray-700">出荷一覧</span>
+            <Badge variant="secondary" className="px-2 py-0.5 text-xs font-medium">
               {pagination.total}件中 {calves.length}件表示
             </Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+            {pagination.hasNext && <span className="text-xs text-gray-500">スクロールでさらに読み込み</span>}
+          </div>
+
+          <div>
+            <ShipmentFiltersComponent filters={currentFilters} onFilterChange={handleFilterChange} isLoading={isLoading} />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Button onClick={() => addNewRow(filters.farmId)} className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm" size="sm">
+              <Plus className="w-3 h-3 mr-1" />
+              新規追加
+            </Button>
+            {pendingChanges.length > 0 && (
+              <Button onClick={handleBatchSave} className="bg-green-600 hover:bg-green-700 text-white shadow-sm" size="sm">
+                <Check className="w-3 h-3 mr-1" />
+                一括保存 ({pendingChanges.length})
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* メインテーブル */}
+        <div className="bg-white rounded border border-gray-200 shadow-sm overflow-hidden">
           <ShipmentTable
             calves={calves}
             editingRows={editingRows}
             pendingChanges={pendingChanges}
             newRows={newRows}
+            cows={cows}
+            cowsLoading={cowsLoading}
             onStartEditing={startEditing}
             onCancelEditing={cancelEditing}
             onUpdate={handleUpdate}
@@ -242,13 +292,20 @@ export default function CalfShipmentListPresentation({ initialData, filters, lim
             onNewRowFieldUpdate={updateNewRowField}
             onSaveNewRow={handleSaveNewRow}
             onRemoveNewRow={removeNewRow}
+            onSelectCow={selectCow}
           />
-        </CardContent>
-      </Card>
+        </div>
 
-      {isLoading && <LoadingSpinner />}
+        {/* ローディングインジケーター */}
+        {isLoading && (
+          <div className="mt-3 flex justify-center">
+            <LoadingSpinner />
+          </div>
+        )}
 
-      <div ref={loadMoreRef} className="h-4" />
+        {/* 無限スクロール用のトリガー */}
+        <div ref={loadMoreRef} className="h-2" />
+      </div>
     </div>
   );
 }

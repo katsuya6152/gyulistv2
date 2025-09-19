@@ -16,6 +16,7 @@ export type CancelCalfShipmentSuccess = InferResponseType<(typeof client.api.v2.
 export type BatchUpdateCalfShipmentsSuccess = InferResponseType<typeof client.api.v2.calves.shipments.batch.$put, 200>;
 export type GetCowShipmentInfoSuccess = InferResponseType<(typeof client.api.v2.cows)[":cowId"]["calves"]["shipments"]["$get"], 200>;
 export type CreateCalfSuccess = InferResponseType<typeof client.api.v2.calves.$post, 200>;
+export type GetCowsSuccess = InferResponseType<typeof client.api.v2.calves.cows.$get, 200>;
 
 class ShipmentService {
   /**
@@ -116,6 +117,37 @@ class ShipmentService {
 
       // エラーメッセージを適切に文字列化
       let errorMessage = "子牛の作成に失敗しました";
+      if ("error" in errorData) {
+        if (typeof errorData.error === "string") {
+          errorMessage = errorData.error;
+        } else if (typeof errorData.error === "object" && errorData.error !== null) {
+          errorMessage = JSON.stringify(errorData.error);
+        }
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    return response.json();
+  }
+
+  /**
+   * 母牛一覧を取得（新規子牛作成用）
+   */
+  async getCows(farmId: string): Promise<GetCowsSuccess> {
+    const response = await client.api.v2.calves.cows.$get({
+      query: { farmId },
+    });
+
+    if (response.status !== 200) {
+      const errorData = await response.json();
+      console.error("API error response:", {
+        status: response.status,
+        errorData: errorData,
+      });
+
+      // エラーメッセージを適切に文字列化
+      let errorMessage = "母牛一覧の取得に失敗しました";
       if ("error" in errorData) {
         if (typeof errorData.error === "string") {
           errorMessage = errorData.error;

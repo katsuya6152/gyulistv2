@@ -1,6 +1,6 @@
 "use server";
 
-import { type CreateCalfSuccess, shipmentService } from "@/services/shipmentService";
+import { type CreateCalfSuccess, type GetCowsSuccess, shipmentService } from "@/services/shipmentService";
 import { batchUpdateCalfShipmentsParamsSchema, getCalfShipmentsParamsSchema, updateCalfShipmentSchema } from "../schemas/calf-shipment";
 import type { BatchUpdateCalfShipmentsParams, GetCalfShipmentsParams, UpdateCalfShipment } from "../schemas/calf-shipment";
 
@@ -143,6 +143,42 @@ export async function createCalfShipmentAction(data: Parameters<typeof shipmentS
 
     // エラーメッセージを適切に処理
     let errorMessage = "子牛出荷の作成に失敗しました";
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (typeof error === "string") {
+      errorMessage = error;
+    } else if (error && typeof error === "object") {
+      errorMessage = JSON.stringify(error);
+    }
+
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+}
+
+/**
+ * 母牛一覧を取得（新規子牛作成用）
+ */
+export async function getCowsAction(farmId: string) {
+  try {
+    const result = await shipmentService.getCows(farmId);
+
+    return {
+      success: true,
+      data: result.data,
+    };
+  } catch (error) {
+    console.error("Get cows error:", error);
+    console.error("Error details:", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+      error: error,
+    });
+
+    // エラーメッセージを適切に処理
+    let errorMessage = "母牛一覧の取得に失敗しました";
     if (error instanceof Error) {
       errorMessage = error.message;
     } else if (typeof error === "string") {

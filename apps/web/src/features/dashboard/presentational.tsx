@@ -3,6 +3,7 @@
 import LogoutButton from "@/components/logout-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
 import type { User } from "./schema";
 
 interface DashboardPresentationProps {
@@ -39,9 +40,7 @@ export default function DashboardPresentation({ user }: DashboardPresentationPro
                 <CardDescription>母牛・子牛の繁殖記録を管理</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-gray-600 mb-4">
-                  交配記録、妊娠確認、分娩記録などを管理できます。
-                </p>
+                <p className="text-sm text-gray-600 mb-4">交配記録、妊娠確認、分娩記録などを管理できます。</p>
                 <Button className="w-full" disabled>
                   近日公開
                 </Button>
@@ -55,11 +54,9 @@ export default function DashboardPresentation({ user }: DashboardPresentationPro
                 <CardDescription>年毎・母牛毎の出荷記録を管理</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-gray-600 mb-4">
-                  出荷記録、重量、価格などを管理できます。
-                </p>
-                <Button className="w-full" disabled>
-                  近日公開
+                <p className="text-sm text-gray-600 mb-4">出荷記録、重量、価格などを管理できます。</p>
+                <Button className="w-full" asChild>
+                  <Link href="/cow-shipment-management">出荷管理を開く</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -71,9 +68,7 @@ export default function DashboardPresentation({ user }: DashboardPresentationPro
                 <CardDescription>せり結果と落札情報を管理</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-gray-600 mb-4">
-                  せり場での落札結果を記録・管理できます。
-                </p>
+                <p className="text-sm text-gray-600 mb-4">せり場での落札結果を記録・管理できます。</p>
                 <Button className="w-full" disabled>
                   近日公開
                 </Button>
@@ -101,9 +96,7 @@ export default function DashboardPresentation({ user }: DashboardPresentationPro
                 <CardDescription>繁殖成績の分析とレポート生成</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-gray-600 mb-4">
-                  繁殖成績の分析とレポートを生成できます。
-                </p>
+                <p className="text-sm text-gray-600 mb-4">繁殖成績の分析とレポートを生成できます。</p>
                 <Button className="w-full" disabled>
                   近日公開
                 </Button>
@@ -117,9 +110,7 @@ export default function DashboardPresentation({ user }: DashboardPresentationPro
                 <CardDescription>アカウントと農場情報の管理</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-gray-600 mb-4">
-                  アカウント情報や農場情報を管理できます。
-                </p>
+                <p className="text-sm text-gray-600 mb-4">アカウント情報や農場情報を管理できます。</p>
                 <Button className="w-full" disabled>
                   近日公開
                 </Button>

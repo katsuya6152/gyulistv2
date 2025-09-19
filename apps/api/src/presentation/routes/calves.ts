@@ -7,9 +7,11 @@ import { GetCalfShipmentsUseCase } from "../../application/use-cases/calf-shipme
 import { UpdateCalfShipmentUseCase } from "../../application/use-cases/calf-shipment/update-calf-shipment";
 import { createCalf } from "../../domain/entities/calf";
 import { DrizzleCalfRepository } from "../../infrastructure/repositories/drizzle-calf-repository";
+import { DrizzleCowRepository } from "../../infrastructure/repositories/drizzle-cow-repository";
 
 // リポジトリのインスタンス化
 const calfRepository = new DrizzleCalfRepository();
+const cowRepository = new DrizzleCowRepository();
 
 export function createCalvesRoutes() {
   const calvesRouter = new Hono();
@@ -258,6 +260,56 @@ export function createCalvesRoutes() {
           return c.json({
             success: true,
             data: result.data,
+          });
+        } catch {
+          return c.json(
+            {
+              success: false,
+              error: "Internal server error",
+            },
+            500
+          );
+        }
+      })
+      // 母牛一覧取得（新規子牛作成用）
+      .get("/cows", async (c) => {
+        try {
+          const farmId = c.req.query("farmId");
+          if (!farmId) {
+            return c.json(
+              {
+                success: false,
+                error: "farmId is required",
+              },
+              400
+            );
+          }
+
+          const result = await cowRepository.findByFarmId(farmId);
+          if (!result.success) {
+            return c.json(
+              {
+                success: false,
+                error:
+                  typeof result.error === "object" && result.error !== null && "message" in result.error
+                    ? (result.error as any).message
+                    : "Failed to fetch cows",
+              },
+              500
+            );
+          }
+
+          const cows = result.data.map((cow) => ({
+            id: cow.id,
+            individualNumber: cow.individualNumber,
+            name: cow.name,
+            birthDate: cow.birthDate,
+            gender: "FEMALE", // 母牛は全てメス
+          }));
+
+          return c.json({
+            success: true,
+            data: cows,
           });
         } catch {
           return c.json(
