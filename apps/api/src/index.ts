@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { hc } from "hono/client";
 import { cors } from "hono/cors";
 import { checkDatabaseConnection, getDatabaseInfo } from "./db/connection.js";
+import { createAnalyticsRoutes } from "./presentation/routes/analytics";
 import authRoutes from "./presentation/routes/auth";
 import { createAuthRoutes } from "./presentation/routes/auth";
 import { createCalvesRoutes } from "./presentation/routes/calves";
@@ -24,6 +25,7 @@ export const createRoutes = (app: Hono) => {
     .route("/auth", createAuthRoutes())
     .route("/calves", createCalvesRoutes())
     .route("/cows", createCowsRoutes())
+    .route("/analytics", createAnalyticsRoutes())
     .get("/health", async (c) => {
       const dbInfo = await getDatabaseInfo();
       return c.json({

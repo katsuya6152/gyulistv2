@@ -93,12 +93,12 @@ export default function DashboardPresentation({ user }: DashboardPresentationPro
             <Card>
               <CardHeader>
                 <CardTitle>分析・レポート</CardTitle>
-                <CardDescription>繁殖成績の分析とレポート生成</CardDescription>
+                <CardDescription>出荷データの分析とレポート生成</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-gray-600 mb-4">繁殖成績の分析とレポートを生成できます。</p>
-                <Button className="w-full" disabled>
-                  近日公開
+                <p className="text-sm text-gray-600 mb-4">出荷データの分析とレポートを生成できます。</p>
+                <Button className="w-full" asChild>
+                  <Link href="/analytics">分析・レポートを開く</Link>
                 </Button>
               </CardContent>
             </Card>
